@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import me.study.foostudy.AcceptanceTest;
+import me.study.foostudy.board.domain.Post;
 
 @DisplayName("게시글")
 public class PostAcceptanceTest extends AcceptanceTest {
@@ -12,7 +13,23 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@Test
 	void createPost() {
 		// TODO : 2021/06/23 게시글을 등록한다   -ksc
+		게시글_등록_요청("새로운 게시글 제목", "새로운 게시글 내용을 등록합니다.");
 		// TODO : 2021/06/23 등록된 게시글을 확인한다   -ksc
+	}
+
+	private void 게시글_등록_요청(String title, String content) {
+		client.post().uri("/posts")
+			.bodyValue(getPost(title, content))
+			.exchange()
+			.expectStatus().isCreated()
+			.expectBody();
+	}
+
+	private Post getPost(String title, String content) {
+		return Post.builder()
+			.title(title)
+			.content(content)
+			.build();
 	}
 
 	@DisplayName("게시글 목록을 조회한다")
