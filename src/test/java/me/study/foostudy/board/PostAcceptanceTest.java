@@ -12,12 +12,10 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@DisplayName("게시글을 등록한다")
 	@Test
 	void createPost() {
-		// TODO : 2021/06/23 게시글을 등록한다   -ksc
-		게시글_등록_요청("새로운 게시글 제목", "새로운 게시글 내용을 등록합니다.");
-		// TODO : 2021/06/23 등록된 게시글을 확인한다   -ksc
+		게시글_등록_되어있음("새로운 게시글 제목", "새로운 게시글 내용을 등록합니다.");
 	}
 
-	private void 게시글_등록_요청(String title, String content) {
+	private void 게시글_등록_되어있음(String title, String content) {
 		client.post().uri("/posts")
 			.bodyValue(getPost(title, content))
 			.exchange()
