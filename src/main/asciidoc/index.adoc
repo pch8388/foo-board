@@ -1,0 +1,9 @@
+= Spring boot Study
+
+== POST
+
+=== 등록 Request
+include::{snippets}/post-new-item/http-request.adoc[]
+
+=== 등록 Response
+include::{snippets}/post-new-item/http-response.adoc[]

@@ -1,5 +1,8 @@
 package me.study.foostudy.board;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +23,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.bodyValue(getPost(title, content))
 			.exchange()
 			.expectStatus().isCreated()
-			.expectBody();
+			.expectBody()
+			.consumeWith(document("post-new-item", preprocessResponse(prettyPrint())));
 	}
 
 	private Post getPost(String title, String content) {
