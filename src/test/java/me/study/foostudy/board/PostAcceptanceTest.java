@@ -1,13 +1,19 @@
 package me.study.foostudy.board;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
 import me.study.foostudy.board.domain.Post;
+import reactor.core.publisher.Mono;
 
 @DisplayName("게시글")
 public class PostAcceptanceTest extends AcceptanceTest {
@@ -19,12 +25,35 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	}
 
 	private void 게시글_등록_되어있음(String title, String content) {
-		client.post().uri("/posts")
-			.bodyValue(getPost(title, content))
+		// given, when
+		final Post responsePost = client.post().uri("/posts")
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.body(BodyInserters.fromPublisher(Mono.just(getPost(title, content)), Post.class))
 			.exchange()
 			.expectStatus().isCreated()
-			.expectBody()
-			.consumeWith(document("post-new-item", preprocessResponse(prettyPrint())));
+			.expectBody(Post.class)
+			.consumeWith(document("post-new-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("id").description("xxx"),
+					fieldWithPath("title").description("게시글 제목"),
+					fieldWithPath("content").description("게시글 내용")
+				),
+				responseFields(
+					fieldWithPath("id").type(JsonFieldType.STRING).description("게시글 id"),
+					fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+					fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 내용")
+				)))
+			.returnResult()
+			.getResponseBody();
+
+		// then
+		assertThat(responsePost).isNotNull();
+		assertThat(responsePost.getId()).isNotEmpty();
+		assertThat(responsePost.getTitle()).isEqualTo(title);
+		assertThat(responsePost.getContent()).isEqualTo(content);
 	}
 
 	private Post getPost(String title, String content) {

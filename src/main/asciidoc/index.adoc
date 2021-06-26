@@ -1,9 +1,15 @@
 = Spring boot Study
 
-== POST
+== 게시글 등록
 
-=== 등록 Request
+=== Request
 include::{snippets}/post-new-item/http-request.adoc[]
 
-=== 등록 Response
+=== Request Parameter
+include::{snippets}/post-new-item/request-fields.adoc[]
+
+=== Response
 include::{snippets}/post-new-item/http-response.adoc[]
+
+=== Response Fields
+include::{snippets}/post-new-item/response-fields.adoc[]
