@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
 import me.study.foostudy.board.domain.Post;
+import me.study.foostudy.board.dto.RequestPostDto;
 import reactor.core.publisher.Mono;
 
 @DisplayName("게시글")
@@ -29,7 +30,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		final Post responsePost = client.post().uri("/posts")
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
-			.body(BodyInserters.fromPublisher(Mono.just(getPost(title, content)), Post.class))
+			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)), RequestPostDto.class))
 			.exchange()
 			.expectStatus().isCreated()
 			.expectBody(Post.class)
@@ -37,7 +38,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
-					fieldWithPath("id").description("xxx"),
 					fieldWithPath("title").description("게시글 제목"),
 					fieldWithPath("content").description("게시글 내용")
 				),
@@ -56,11 +56,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		assertThat(responsePost.getContent()).isEqualTo(content);
 	}
 
-	private Post getPost(String title, String content) {
-		return Post.builder()
-			.title(title)
-			.content(content)
-			.build();
+	private RequestPostDto requestPost(String title, String content) {
+		return new RequestPostDto(title, content);
 	}
 
 	@DisplayName("게시글 목록을 조회한다")
