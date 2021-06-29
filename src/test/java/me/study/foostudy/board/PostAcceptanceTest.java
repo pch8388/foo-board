@@ -49,10 +49,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		assertThat(responseDto.getContent()).isEqualTo(content);
 		assertThat(responseDto.getCreatedDate()).isNotNull();
 		assertThat(responseDto.getModifiedDate()).isNotNull();
-
-		System.out.println("logging ==========================");
-		System.out.println(responseDto.getCreatedDate());
-		System.out.println(responseDto.getModifiedDate());
 	}
 
 	private ResponseFieldsSnippet getNewPostResponseSnippet() {
