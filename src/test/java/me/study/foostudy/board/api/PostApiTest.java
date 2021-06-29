@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ class PostApiTest {
 	}
 
 	@Test
-	void test() {
+	@DisplayName("게시글 저장")
+	void savePost() {
 		// given
 		final String title = "Test";
 		final String content = "test111";
