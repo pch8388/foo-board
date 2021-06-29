@@ -1,14 +1,15 @@
 package me.study.foostudy.board;
 
+import static me.study.foostudy.utils.DocumentationUtil.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
@@ -30,22 +31,13 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		final Post responsePost = client.post().uri("/posts")
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
-			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)), RequestPostDto.class))
+			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)),
+				RequestPostDto.class))
 			.exchange()
 			.expectStatus().isCreated()
 			.expectBody(Post.class)
-			.consumeWith(document("post-new-item",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				requestFields(
-					fieldWithPath("title").description("게시글 제목"),
-					fieldWithPath("content").description("게시글 내용")
-				),
-				responseFields(
-					fieldWithPath("id").type(JsonFieldType.STRING).description("게시글 id"),
-					fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
-					fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 내용")
-				)))
+			.consumeWith(getDocument("post-new-item",
+				getNewPostRequestSnippet(), getNewPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
 
@@ -54,6 +46,21 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		assertThat(responsePost.getId()).isNotEmpty();
 		assertThat(responsePost.getTitle()).isEqualTo(title);
 		assertThat(responsePost.getContent()).isEqualTo(content);
+	}
+
+	private ResponseFieldsSnippet getNewPostResponseSnippet() {
+		return responseFields(
+			fieldWithPath("id").type(JsonFieldType.STRING).description("게시글 id"),
+			fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+			fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 내용")
+		);
+	}
+
+	private RequestFieldsSnippet getNewPostRequestSnippet() {
+		return requestFields(
+			fieldWithPath("title").description("게시글 제목"),
+			fieldWithPath("content").description("게시글 내용")
+		);
 	}
 
 	private RequestPostDto requestPost(String title, String content) {
