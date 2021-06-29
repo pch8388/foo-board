@@ -2,6 +2,8 @@ package me.study.foostudy.board.api;
 
 import java.net.URI;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +24,7 @@ public class PostApi {
 	private final PostService postService;
 
 	@PostMapping
-	public Mono<ResponseEntity<?>> createNewPost(@RequestBody Mono<RequestPostDto> postDto) {
+	public Mono<ResponseEntity<?>> createNewPost(@Valid @RequestBody Mono<RequestPostDto> postDto) {
 		return postDto.flatMap(this.postService::saveNewPost)
 			.map(savedItem ->
 				ResponseEntity.created(URI.create("/posts/" + savedItem.getId()))
