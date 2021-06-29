@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import me.study.foostudy.AcceptanceTest;
 import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.dto.RequestPostDto;
+import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 
 @DisplayName("게시글")
@@ -28,31 +29,39 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글_등록_되어있음(String title, String content) {
 		// given, when
-		final Post responsePost = client.post().uri("/posts")
+		final ResponsePostDto responseDto = client.post().uri("/posts")
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)),
 				RequestPostDto.class))
 			.exchange()
 			.expectStatus().isCreated()
-			.expectBody(Post.class)
+			.expectBody(ResponsePostDto.class)
 			.consumeWith(getDocument("post-new-item",
 				getNewPostRequestSnippet(), getNewPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
 
 		// then
-		assertThat(responsePost).isNotNull();
-		assertThat(responsePost.getId()).isNotEmpty();
-		assertThat(responsePost.getTitle()).isEqualTo(title);
-		assertThat(responsePost.getContent()).isEqualTo(content);
+		assertThat(responseDto).isNotNull();
+		assertThat(responseDto.getId()).isNotEmpty();
+		assertThat(responseDto.getTitle()).isEqualTo(title);
+		assertThat(responseDto.getContent()).isEqualTo(content);
+		assertThat(responseDto.getCreatedDate()).isNotNull();
+		assertThat(responseDto.getModifiedDate()).isNotNull();
+
+		System.out.println("logging ==========================");
+		System.out.println(responseDto.getCreatedDate());
+		System.out.println(responseDto.getModifiedDate());
 	}
 
 	private ResponseFieldsSnippet getNewPostResponseSnippet() {
 		return responseFields(
 			fieldWithPath("id").type(JsonFieldType.STRING).description("게시글 id"),
 			fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
-			fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 내용")
+			fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 내용"),
+			fieldWithPath("createdDate").type(JsonFieldType.STRING).description("생성시간"),
+			fieldWithPath("modifiedDate").type(JsonFieldType.STRING).description("수정시간")
 		);
 	}
 
