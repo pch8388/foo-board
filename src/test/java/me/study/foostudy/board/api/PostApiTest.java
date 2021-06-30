@@ -6,8 +6,9 @@ import static org.mockito.ArgumentMatchers.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -25,8 +26,6 @@ import reactor.test.StepVerifier;
 @AutoConfigureWebTestClient
 class PostApiTest {
 
-	@Autowired
-	private WebTestClient client;
 	private PostService postService;
 	private PostApi postApi;
 
@@ -36,8 +35,8 @@ class PostApiTest {
 		postApi = new PostApi(postService);
 	}
 
-	@Test
 	@DisplayName("게시글 저장")
+	@Test
 	void savePost() {
 		// given
 		final String title = "Test";
@@ -68,6 +67,34 @@ class PostApiTest {
 			})
 			.expectComplete()
 			.verify();
+	}
+
+	@DisplayName("게시글 저장 - validation error")
+	@ParameterizedTest
+	@CsvSource({"'', test111", "test, ''", "'', ''"})
+	void savePost_valid_exception(String title, String content) {
+
+		// when
+		Mockito.when(postService.saveNewPost(any()))
+			.thenReturn(Mono.just(Post.builder().title(title).content(content).build()));
+
+		// then
+		WebTestClient
+			.bindToController(postApi)
+			.build()
+			.post().uri("/posts")
+			.body(BodyInserters.fromPublisher(Mono.just(new RequestPostDto(title, content)),
+				RequestPostDto.class))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.returnResult(ResponsePostDto.class)
+			.getResponseBody()
+			.as(StepVerifier::create)
+			.expectComplete()
+			.verify();
+
+		// TODO : 2021/06/29 validation error 메시지 정제   -ksc
+		// https://kalpads.medium.com/request-validation-with-spring-webflux-fff1132c31df :: 참고
 	}
 
 }
