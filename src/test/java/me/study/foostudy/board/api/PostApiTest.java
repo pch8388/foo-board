@@ -92,9 +92,6 @@ class PostApiTest {
 			.as(StepVerifier::create)
 			.expectComplete()
 			.verify();
-
-		// TODO : 2021/06/29 validation error 메시지 정제   -ksc
-		// https://kalpads.medium.com/request-validation-with-spring-webflux-fff1132c31df :: 참고
 	}
 
 }
