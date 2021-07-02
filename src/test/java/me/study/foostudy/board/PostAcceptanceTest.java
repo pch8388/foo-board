@@ -2,7 +2,10 @@ package me.study.foostudy.board;
 
 import static me.study.foostudy.utils.DocumentationUtil.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +33,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	private void 게시글_등록_되어있음(String title, String content) {
 		// given, when
 		final ResponsePostDto responseDto = client.post().uri("/posts")
-			.contentType(MediaType.APPLICATION_JSON)
-			.accept(MediaType.APPLICATION_JSON)
+			.contentType(APPLICATION_JSON)
+			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)),
 				RequestPostDto.class))
 			.exchange()
@@ -85,7 +88,24 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	}
 
 	private void 게시글_목록_조회(int size) {
+		final List<ResponsePostDto> responsePosts = client.get().uri("/posts")
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(ResponsePostDto.class)
+			.consumeWith(getDocument("post-list-item", responseFields(
+				fieldWithPath("[]").description("array"),
+				fieldWithPath("[].id").type(JsonFieldType.STRING).description("게시글 id"),
+				fieldWithPath("[].title").type(JsonFieldType.STRING).description("게시글 제목"),
+				fieldWithPath("[].content").type(JsonFieldType.STRING).description("게시글 내용"),
+				fieldWithPath("[].createdDate").type(JsonFieldType.STRING).description("생성시간"),
+				fieldWithPath("[].modifiedDate").type(JsonFieldType.STRING).description("수정시간")
+			)))
+			.returnResult()
+			.getResponseBody();
 
+		assertThat(responsePosts).isNotNull();
+		assertThat(responsePosts.size()).isEqualTo(size);
 	}
 
 	@DisplayName("게시글을 삭제한다")

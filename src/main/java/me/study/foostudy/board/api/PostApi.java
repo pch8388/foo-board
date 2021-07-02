@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import me.study.foostudy.board.application.PostService;
 import me.study.foostudy.board.dto.RequestPostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -29,5 +31,11 @@ public class PostApi {
 			.map(savedItem ->
 				ResponseEntity.created(URI.create("/posts/" + savedItem.getId()))
 					.body(ResponsePostDto.convertFromEntity(savedItem)));
+	}
+
+	@GetMapping
+	public Flux<ResponsePostDto> listPost() {
+		return this.postService.findAll()
+			.map(ResponsePostDto::convertFromEntity);
 	}
 }

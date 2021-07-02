@@ -18,4 +18,12 @@ public class DocumentationUtil {
 			preprocessResponse(prettyPrint()),
 			requestSnippet, responseSnippet);
 	}
+
+	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,
+		ResponseFieldsSnippet responseSnippet) {
+		return document(identifier,
+			preprocessRequest(prettyPrint()),
+			preprocessResponse(prettyPrint()),
+			responseSnippet);
+	}
 }
