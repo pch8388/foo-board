@@ -13,3 +13,11 @@ include::{snippets}/post-new-item/http-response.adoc[]
 
 === Response Fields
 include::{snippets}/post-new-item/response-fields.adoc[]
+
+== 게시글 조회
+
+=== Response
+include::{snippets}/post-list-item/http-response.adoc[]
+
+=== Response Fields
+include::{snippets}/post-list-item/response-fields.adoc[]
