@@ -1,10 +1,8 @@
 package me.study.foostudy.board.application;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.domain.PostRepository;
 import me.study.foostudy.board.dto.RequestPostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
