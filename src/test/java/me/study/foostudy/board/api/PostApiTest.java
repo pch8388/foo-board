@@ -44,7 +44,7 @@ class PostApiTest {
 
 		// when
 		Mockito.when(postService.saveNewPost(any()))
-			.thenReturn(Mono.just(Post.builder().title(title).content(content).build()));
+			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
 
 		// then
 		WebTestClient
@@ -76,7 +76,7 @@ class PostApiTest {
 
 		// when
 		Mockito.when(postService.saveNewPost(any()))
-			.thenReturn(Mono.just(Post.builder().title(title).content(content).build()));
+			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
 
 		// then
 		WebTestClient

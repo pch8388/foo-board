@@ -30,12 +30,11 @@ public class PostApi {
 		return postDto.flatMap(this.postService::saveNewPost)
 			.map(savedItem ->
 				ResponseEntity.created(URI.create("/posts/" + savedItem.getId()))
-					.body(ResponsePostDto.convertFromEntity(savedItem)));
+					.body(savedItem));
 	}
 
 	@GetMapping
 	public Flux<ResponsePostDto> listPost() {
-		return this.postService.findAll()
-			.map(ResponsePostDto::convertFromEntity);
+		return this.postService.findAll();
 	}
 }

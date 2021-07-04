@@ -42,20 +42,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		게시글_목록_조회(3);
 	}
 
-	private void 게시글_목록_조회(int size) {
-		final List<ResponsePostDto> responsePosts = client.get().uri("/posts")
-			.accept(APPLICATION_JSON)
-			.exchange()
-			.expectStatus().isOk()
-			.expectBodyList(ResponsePostDto.class)
-			.consumeWith(getDocument("post-list-item", getPostListResponseSnippet()))
-			.returnResult()
-			.getResponseBody();
-
-		assertThat(responsePosts).isNotNull();
-		assertThat(responsePosts.size()).isEqualTo(size);
-	}
-
 	@DisplayName("게시글을 삭제한다")
 	@Test
 	void deletePost() {
@@ -115,6 +101,20 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private RequestPostDto requestPost(String title, String content) {
 		return new RequestPostDto(title, content);
+	}
+
+	private void 게시글_목록_조회(int size) {
+		final List<ResponsePostDto> responsePosts = client.get().uri("/posts")
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(ResponsePostDto.class)
+			.consumeWith(getDocument("post-list-item", getPostListResponseSnippet()))
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(responsePosts).isNotNull();
+		assertThat(responsePosts.size()).isEqualTo(size);
 	}
 
 	private ResponseFieldsSnippet getPostListResponseSnippet() {
