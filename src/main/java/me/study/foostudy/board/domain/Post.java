@@ -19,4 +19,8 @@ public class Post extends BaseEntity {
 		this.title = title;
 		this.content = content;
 	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
 }
