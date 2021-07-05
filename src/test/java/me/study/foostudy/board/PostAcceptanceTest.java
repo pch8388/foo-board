@@ -9,14 +9,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
-import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.dto.RequestPostDto;
 import me.study.foostudy.board.dto.RequestUpdatePostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
@@ -60,6 +58,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.exchange()
 			.expectStatus().isOk()
 			.expectBody(ResponsePostDto.class)
+			.consumeWith(getDocument("post-update-item",
+				getUpdatePostRequestSnippet(), getPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
 
@@ -69,6 +69,12 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		assertThat(responseDto.getContent()).isEqualTo(updateContent);
 		assertThat(responseDto.getCreatedDate())
 			.isNotEqualTo(responseDto.getModifiedDate());
+	}
+
+	private RequestFieldsSnippet getUpdatePostRequestSnippet() {
+		return requestFields(
+			fieldWithPath("updateContent").description("게시글 내용")
+		);
 	}
 
 	private RequestUpdatePostDto requestUpdatePost(String updateContent) {
@@ -106,12 +112,12 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.expectStatus().isCreated()
 			.expectBody(ResponsePostDto.class)
 			.consumeWith(getDocument("post-new-item",
-				getNewPostRequestSnippet(), getNewPostResponseSnippet()))
+				getNewPostRequestSnippet(), getPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
 	}
 
-	private ResponseFieldsSnippet getNewPostResponseSnippet() {
+	private ResponseFieldsSnippet getPostResponseSnippet() {
 		return responseFields(
 			fieldWithPath("id").type(JsonFieldType.STRING).description("게시글 id"),
 			fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),

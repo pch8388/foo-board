@@ -21,3 +21,11 @@ include::{snippets}/post-list-item/http-response.adoc[]
 
 === Response Fields
 include::{snippets}/post-list-item/response-fields.adoc[]
+
+== 게시글 수정
+
+=== Response
+include::{snippets}/post-update-item/http-response.adoc[]
+
+=== Response Fields
+include::{snippets}/post-update-item/response-fields.adoc[]
