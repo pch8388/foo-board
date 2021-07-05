@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import me.study.foostudy.AcceptanceTest;
 import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.dto.RequestPostDto;
+import me.study.foostudy.board.dto.RequestUpdatePostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 
@@ -42,6 +43,38 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		게시글_목록_조회(3);
 	}
 
+	@DisplayName("게시글을 수정한다")
+	@Test
+	void updatePost() {
+		final ResponsePostDto postDto = 게시글_등록("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
+
+		게시글_수정_되어있음(postDto.getId(), "수정된 게시글 내용 등록");
+	}
+
+	private void 게시글_수정_되어있음(String postId, String updateContent) {
+		final ResponsePostDto responseDto = client.patch().uri("/posts/" + postId)
+			.contentType(APPLICATION_JSON)
+			.accept(APPLICATION_JSON)
+			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost(updateContent)),
+				RequestUpdatePostDto.class))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(ResponsePostDto.class)
+			.returnResult()
+			.getResponseBody();
+
+		// then
+		assertThat(responseDto).isNotNull();
+		assertThat(responseDto.getId()).isNotEmpty();
+		assertThat(responseDto.getContent()).isEqualTo(updateContent);
+		assertThat(responseDto.getCreatedDate())
+			.isNotEqualTo(responseDto.getModifiedDate());
+	}
+
+	private RequestUpdatePostDto requestUpdatePost(String updateContent) {
+		return new RequestUpdatePostDto(updateContent);
+	}
+
 	@DisplayName("게시글을 삭제한다")
 	@Test
 	void deletePost() {
@@ -50,17 +83,21 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		// TODO : 2021/06/23 삭제되었는지 확인한다   -ksc
 	}
 
-	@DisplayName("게시글을 수정한다")
-	@Test
-	void updatePost() {
-		// TODO : 2021/06/23 게시글을 등록한다   -ksc
-		// TODO : 2021/06/23 등록된 게시글을 수정한다   -ksc
-		// TODO : 2021/06/23 수정되었는지 확인한다   -ksc
-	}
-
 	private void 게시글_등록_되어있음(String title, String content) {
 		// given, when
-		final ResponsePostDto responseDto = client.post().uri("/posts")
+		final ResponsePostDto responseDto = 게시글_등록(title, content);
+
+		// then
+		assertThat(responseDto).isNotNull();
+		assertThat(responseDto.getId()).isNotEmpty();
+		assertThat(responseDto.getTitle()).isEqualTo(title);
+		assertThat(responseDto.getContent()).isEqualTo(content);
+		assertThat(responseDto.getCreatedDate()).isNotNull();
+		assertThat(responseDto.getModifiedDate()).isNotNull();
+	}
+
+	private ResponsePostDto 게시글_등록(String title, String content) {
+		return client.post().uri("/posts")
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)),
@@ -72,14 +109,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 				getNewPostRequestSnippet(), getNewPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
-
-		// then
-		assertThat(responseDto).isNotNull();
-		assertThat(responseDto.getId()).isNotEmpty();
-		assertThat(responseDto.getTitle()).isEqualTo(title);
-		assertThat(responseDto.getContent()).isEqualTo(content);
-		assertThat(responseDto.getCreatedDate()).isNotNull();
-		assertThat(responseDto.getModifiedDate()).isNotNull();
 	}
 
 	private ResponseFieldsSnippet getNewPostResponseSnippet() {

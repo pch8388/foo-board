@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import me.study.foostudy.board.domain.PostRepository;
 import me.study.foostudy.board.dto.RequestPostDto;
+import me.study.foostudy.board.dto.RequestUpdatePostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,5 +24,15 @@ public class PostService {
 	public Flux<ResponsePostDto> findAll() {
 		return this.postRepository.findAll()
 			.map(ResponsePostDto::convertFromEntity);
+	}
+
+	public Mono<ResponsePostDto> updatePost(String postId, RequestUpdatePostDto updatePostDto) {
+		return this.postRepository.findById(postId)
+			.flatMap(post -> {
+				post.updateContent(updatePostDto.getUpdateContent());
+				return this.postRepository.save(post);
+			})
+			.map(ResponsePostDto::convertFromEntity)
+			.switchIfEmpty(Mono.error(new IllegalArgumentException("잘못된 post id")));
 	}
 }
