@@ -54,18 +54,15 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@DisplayName("없는 게시글을 수정하려하면 예외를 발생시킨다")
 	@Test
 	void updatePost_invalidId() {
-		final String errorMessage = client.patch().uri("/posts/" + "123")
-			.contentType(APPLICATION_JSON)
-			.accept(APPLICATION_JSON)
-			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost("수정된 게시글 내용 등록")),
-				RequestUpdatePostDto.class))
-			.exchange()
-			.expectStatus().isBadRequest()
-			.expectBody(String.class)
-			.returnResult()
-			.getResponseBody();
+		게시글이_존재하지_않음();
+	}
 
-		assertThat(errorMessage).isEqualTo("잘못된 post id");
+	@DisplayName("게시글을 삭제한다")
+	@Test
+	void deletePost() {
+		// TODO : 2021/06/23 게시글을 등록한다   -ksc
+		// TODO : 2021/06/23 등록된 게시글을 삭제한다   -ksc
+		// TODO : 2021/06/23 삭제되었는지 확인한다   -ksc
 	}
 
 	private void 게시글_수정_되어있음(String postId, String updateContent) {
@@ -98,14 +95,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private RequestUpdatePostDto requestUpdatePost(String updateContent) {
 		return new RequestUpdatePostDto(updateContent);
-	}
-
-	@DisplayName("게시글을 삭제한다")
-	@Test
-	void deletePost() {
-		// TODO : 2021/06/23 게시글을 등록한다   -ksc
-		// TODO : 2021/06/23 등록된 게시글을 삭제한다   -ksc
-		// TODO : 2021/06/23 삭제되었는지 확인한다   -ksc
 	}
 
 	private void 게시글_등록_되어있음(String title, String content) {
@@ -180,5 +169,20 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			fieldWithPath("[].createdDate").type(JsonFieldType.STRING).description("생성시간"),
 			fieldWithPath("[].modifiedDate").type(JsonFieldType.STRING).description("수정시간")
 		);
+	}
+
+	private void 게시글이_존재하지_않음() {
+		final String errorMessage = client.patch().uri("/posts/" + "123")
+			.contentType(APPLICATION_JSON)
+			.accept(APPLICATION_JSON)
+			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost("수정된 게시글 내용 등록")),
+				RequestUpdatePostDto.class))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(String.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(errorMessage).isEqualTo("잘못된 post id");
 	}
 }
