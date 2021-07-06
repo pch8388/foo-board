@@ -32,21 +32,40 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@DisplayName("게시글 목록을 조회한다")
 	@Test
 	void searchPosts() {
-		// given, when  게시글을 3개 등록한다
+		// given  게시글을 3개 등록한다
 		게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
 		게시글_등록_되어있음("새로운 게시글 제목 - 2", "새로운 게시글 내용을 등록합니다. - 2");
 		게시글_등록_되어있음("새로운 게시글 제목 - 3", "새로운 게시글 내용을 등록합니다. - 3");
 
-		// then  게시글 목록을 조회하여 3개가 맞는지 확인한다
+		// when, then  게시글 목록을 조회하여 3개가 맞는지 확인한다
 		게시글_목록_조회(3);
 	}
 
 	@DisplayName("게시글을 수정한다")
 	@Test
 	void updatePost() {
+		// given
 		final ResponsePostDto postDto = 게시글_등록("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
 
+		// when, then
 		게시글_수정_되어있음(postDto.getId(), "수정된 게시글 내용 등록");
+	}
+
+	@DisplayName("없는 게시글을 수정하려하면 예외를 발생시킨다")
+	@Test
+	void updatePost_invalidId() {
+		final String errorMessage = client.patch().uri("/posts/" + "123")
+			.contentType(APPLICATION_JSON)
+			.accept(APPLICATION_JSON)
+			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost("수정된 게시글 내용 등록")),
+				RequestUpdatePostDto.class))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(String.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(errorMessage).isEqualTo("잘못된 post id");
 	}
 
 	private void 게시글_수정_되어있음(String postId, String updateContent) {
