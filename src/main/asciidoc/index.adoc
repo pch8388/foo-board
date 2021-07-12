@@ -24,8 +24,19 @@ include::{snippets}/post-list-item/response-fields.adoc[]
 
 == 게시글 수정
 
+=== Request
+include::{snippets}/post-update-item/http-request.adoc[]
+
 === Response
 include::{snippets}/post-update-item/http-response.adoc[]
 
 === Response Fields
 include::{snippets}/post-update-item/response-fields.adoc[]
+
+== 게시글 삭제
+
+=== Request
+include::{snippets}/post-delete-item/http-request.adoc[]
+
+=== Response
+include::{snippets}/post-delete-item/http-response.adoc[]
