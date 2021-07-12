@@ -4,11 +4,13 @@ import static me.study.foostudy.utils.DocumentationUtil.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
@@ -45,7 +47,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@Test
 	void updatePost() {
 		// given
-		final ResponsePostDto postDto = 게시글_등록("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
+		final ResponsePostDto postDto = 게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
 
 		// when, then
 		게시글_수정_되어있음(postDto.getId(), "수정된 게시글 내용 등록");
@@ -54,19 +56,35 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	@DisplayName("없는 게시글을 수정하려하면 예외를 발생시킨다")
 	@Test
 	void updatePost_invalidId() {
-		게시글이_존재하지_않음();
+		게시글이_존재하지_않음("123");
 	}
 
 	@DisplayName("게시글을 삭제한다")
 	@Test
 	void deletePost() {
-		// TODO : 2021/06/23 게시글을 등록한다   -ksc
-		// TODO : 2021/06/23 등록된 게시글을 삭제한다   -ksc
-		// TODO : 2021/06/23 삭제되었는지 확인한다   -ksc
+		// given
+		final ResponsePostDto postDto = 게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
+		final String postId = postDto.getId();
+
+		// when
+		게시글_삭제_되어있음(postId);
+
+		// then
+		게시글이_존재하지_않음(postId);
+	}
+
+	private void 게시글_삭제_되어있음(String postId) {
+		client.delete().uri("/posts/{postId}", postId)
+			.exchange()
+			.expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
+			.expectBody()
+			.consumeWith(getDocument("post-delete-item",
+				pathParameters(parameterWithName("postId").description("게시글 id"))));
+
 	}
 
 	private void 게시글_수정_되어있음(String postId, String updateContent) {
-		final ResponsePostDto responseDto = client.patch().uri("/posts/" + postId)
+		final ResponsePostDto responseDto = client.patch().uri("/posts/{postId}", postId)
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost(updateContent)),
@@ -75,6 +93,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.expectStatus().isOk()
 			.expectBody(ResponsePostDto.class)
 			.consumeWith(getDocument("post-update-item",
+				pathParameters(parameterWithName("postId").description("게시글 id")),
 				getUpdatePostRequestSnippet(), getPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
@@ -97,7 +116,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		return new RequestUpdatePostDto(updateContent);
 	}
 
-	private void 게시글_등록_되어있음(String title, String content) {
+	private ResponsePostDto 게시글_등록_되어있음(String title, String content) {
 		// given, when
 		final ResponsePostDto responseDto = 게시글_등록(title, content);
 
@@ -108,6 +127,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		assertThat(responseDto.getContent()).isEqualTo(content);
 		assertThat(responseDto.getCreatedDate()).isNotNull();
 		assertThat(responseDto.getModifiedDate()).isNotNull();
+
+		return responseDto;
 	}
 
 	private ResponsePostDto 게시글_등록(String title, String content) {
@@ -171,8 +192,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		);
 	}
 
-	private void 게시글이_존재하지_않음() {
-		final String errorMessage = client.patch().uri("/posts/" + "123")
+	private void 게시글이_존재하지_않음(String postId) {
+		final String errorMessage = client.patch().uri("/posts/" + postId)
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost("수정된 게시글 내용 등록")),

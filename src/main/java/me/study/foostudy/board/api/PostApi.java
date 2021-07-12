@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,12 +42,18 @@ public class PostApi {
 		return this.postService.findAll();
 	}
 
-	@PatchMapping("/{id}")
+	@PatchMapping("/{postId}")
 	public Mono<ResponseEntity<?>> updatePost(
-		@PathVariable("id") String postId,
+		@PathVariable("postId") String postId,
 		@Valid @RequestBody Mono<RequestUpdatePostDto> updatePostDto) {
 		return updatePostDto.flatMap(dto -> this.postService.updatePost(postId, dto))
 			.map(updatedItem ->
 				ResponseEntity.ok().body(updatedItem));
+	}
+
+	@DeleteMapping("/{postId}")
+	public Mono<ResponseEntity<?>> deletePost(@PathVariable("postId") String postId) {
+		return this.postService.deletePost(postId)
+			.thenReturn(ResponseEntity.noContent().build());
 	}
 }

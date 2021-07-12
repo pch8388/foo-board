@@ -1,5 +1,7 @@
 package me.study.foostudy.board.application;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -34,5 +36,9 @@ public class PostService {
 			})
 			.map(ResponsePostDto::convertFromEntity)
 			.switchIfEmpty(Mono.error(new IllegalArgumentException("잘못된 post id")));
+	}
+
+	public Mono<Void> deletePost(String postId) {
+		return this.postRepository.deleteById(postId);
 	}
 }
