@@ -12,12 +12,8 @@ import org.springframework.test.web.reactive.server.EntityExchangeResult;
 
 public class DocumentationUtil {
 	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,
-		RequestFieldsSnippet requestSnippet,
-		ResponseFieldsSnippet responseSnippet) {
-		return document(identifier,
-			preprocessRequest(prettyPrint()),
-			preprocessResponse(prettyPrint()),
-			requestSnippet, responseSnippet);
+		PathParametersSnippet parametersSnippet) {
+		return document(identifier, parametersSnippet);
 	}
 
 	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,
@@ -29,8 +25,21 @@ public class DocumentationUtil {
 	}
 
 	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,
-		PathParametersSnippet parametersSnippet) {
-		return document(identifier, parametersSnippet);
+		PathParametersSnippet parametersSnippet,
+		ResponseFieldsSnippet responseSnippet) {
+		return document(identifier,
+			preprocessRequest(prettyPrint()),
+			preprocessResponse(prettyPrint()),
+			parametersSnippet, responseSnippet);
+	}
+
+	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,
+		RequestFieldsSnippet requestSnippet,
+		ResponseFieldsSnippet responseSnippet) {
+		return document(identifier,
+			preprocessRequest(prettyPrint()),
+			preprocessResponse(prettyPrint()),
+			requestSnippet, responseSnippet);
 	}
 
 	public static <T> Consumer<EntityExchangeResult<T>> getDocument(String identifier,

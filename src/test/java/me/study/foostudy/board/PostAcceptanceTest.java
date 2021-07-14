@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.PathParametersSnippet;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
@@ -41,6 +42,23 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 		// when, then  게시글 목록을 조회하여 3개가 맞는지 확인한다
 		게시글_목록_조회(3);
+	}
+
+	@DisplayName("특정 게시글을 id로 조회한다")
+	@Test
+	void searchPostById() {
+		// given  게시글을 3개 등록한다
+		final ResponsePostDto responsePostDto =
+			게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
+		게시글_등록_되어있음("새로운 게시글 제목 - 2", "새로운 게시글 내용을 등록합니다. - 2");
+		게시글_등록_되어있음("새로운 게시글 제목 - 3", "새로운 게시글 내용을 등록합니다. - 3");
+
+		// when, then
+		게시글_상세조회(responsePostDto);
+	}
+
+	private PathParametersSnippet getPathParameterWithPostId() {
+		return pathParameters(parameterWithName("postId").description("게시글 id"));
 	}
 
 	@DisplayName("게시글을 수정한다")
@@ -79,7 +97,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
 			.expectBody()
 			.consumeWith(getDocument("post-delete-item",
-				pathParameters(parameterWithName("postId").description("게시글 id"))));
+				getPathParameterWithPostId()));
 
 	}
 
@@ -93,7 +111,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.expectStatus().isOk()
 			.expectBody(ResponsePostDto.class)
 			.consumeWith(getDocument("post-update-item",
-				pathParameters(parameterWithName("postId").description("게시글 id")),
+				getPathParameterWithPostId(),
 				getUpdatePostRequestSnippet(), getPostResponseSnippet()))
 			.returnResult()
 			.getResponseBody();
@@ -165,6 +183,24 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private RequestPostDto requestPost(String title, String content) {
 		return new RequestPostDto(title, content);
+	}
+
+	private void 게시글_상세조회(ResponsePostDto postDto) {
+		final ResponsePostDto responsePostDto = client.get().uri("/posts/{postId}", postDto.getId())
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(ResponsePostDto.class)
+			.consumeWith(getDocument("post-detail-item",
+				getPathParameterWithPostId(),
+				getPostResponseSnippet()))
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(responsePostDto).isNotNull();
+		assertThat(responsePostDto.getId()).isEqualTo(postDto.getId());
+		assertThat(responsePostDto.getTitle()).isEqualTo(postDto.getTitle());
+		assertThat(responsePostDto.getContent()).isEqualTo(postDto.getContent());
 	}
 
 	private void 게시글_목록_조회(int size) {
