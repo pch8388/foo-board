@@ -57,10 +57,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		게시글_상세조회(responsePostDto);
 	}
 
-	private PathParametersSnippet getPathParameterWithPostId() {
-		return pathParameters(parameterWithName("postId").description("게시글 id"));
-	}
-
 	@DisplayName("게시글을 수정한다")
 	@Test
 	void updatePost() {
@@ -241,5 +237,9 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.getResponseBody();
 
 		assertThat(errorMessage).isEqualTo("잘못된 post id");
+	}
+
+	private PathParametersSnippet getPathParameterWithPostId() {
+		return pathParameters(parameterWithName("postId").description("게시글 id"));
 	}
 }

@@ -73,7 +73,6 @@ class PostApiTest {
 	@ParameterizedTest
 	@CsvSource({"'', test111", "test, ''", "'', ''"})
 	void savePost_valid_exception(String title, String content) {
-
 		// when
 		Mockito.when(postService.saveNewPost(any()))
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
@@ -94,4 +93,38 @@ class PostApiTest {
 			.verify();
 	}
 
+	@DisplayName("게시글 상세 조회")
+	@Test
+	void searchPostsById() {
+		// given
+		final String title = "title";
+		final String content = "content";
+		final Post post = Post.builder()
+			.title(title)
+			.content(content)
+			.build();
+
+		// when
+		Mockito.when(postService.findPostsById(any()))
+			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(post)));
+
+		// then
+		WebTestClient
+			.bindToController(postApi)
+			.build()
+			.get().uri("/posts/{postId}", "test-id")
+			.exchange()
+			.expectStatus().isOk()
+			.returnResult(ResponsePostDto.class)
+			.getResponseBody()
+			.as(StepVerifier::create)
+			.expectNextMatches(dto -> {
+				assertThat(dto).isNotNull();
+				assertThat(dto.getTitle()).isEqualTo(title);
+				assertThat(dto.getContent()).isEqualTo(content);
+				return true;
+			})
+			.expectComplete()
+			.verify();
+	}
 }
