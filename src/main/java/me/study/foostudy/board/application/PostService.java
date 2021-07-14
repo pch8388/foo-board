@@ -41,4 +41,10 @@ public class PostService {
 	public Mono<Void> deletePost(String postId) {
 		return this.postRepository.deleteById(postId);
 	}
+
+	public Mono<ResponsePostDto> findPostsById(String postId) {
+		return this.postRepository.findById(postId)
+			.map(ResponsePostDto::convertFromEntity)
+			.switchIfEmpty(Mono.error(new IllegalArgumentException("잘못된 post id")));
+	}
 }

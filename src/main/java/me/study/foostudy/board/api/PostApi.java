@@ -30,20 +30,26 @@ public class PostApi {
 	private final PostService postService;
 
 	@PostMapping
-	public Mono<ResponseEntity<?>> createNewPost(@Valid @RequestBody Mono<RequestPostDto> postDto) {
+	public Mono<ResponseEntity<?>> createNewPosts(@Valid @RequestBody Mono<RequestPostDto> postDto) {
 		return postDto.flatMap(this.postService::saveNewPost)
 			.map(savedItem ->
 				ResponseEntity.created(URI.create("/posts/" + savedItem.getId()))
 					.body(savedItem));
 	}
 
+	@GetMapping("/{postId}")
+	public Mono<ResponseEntity<?>> searchPostsById(@PathVariable String postId) {
+		return this.postService.findPostsById(postId)
+			.map(ResponseEntity::ok);
+	}
+
 	@GetMapping
-	public Flux<ResponsePostDto> listPost() {
+	public Flux<ResponsePostDto> listPosts() {
 		return this.postService.findAll();
 	}
 
 	@PatchMapping("/{postId}")
-	public Mono<ResponseEntity<?>> updatePost(
+	public Mono<ResponseEntity<?>> updatePosts(
 		@PathVariable("postId") String postId,
 		@Valid @RequestBody Mono<RequestUpdatePostDto> updatePostDto) {
 		return updatePostDto.flatMap(dto -> this.postService.updatePost(postId, dto))
@@ -52,8 +58,9 @@ public class PostApi {
 	}
 
 	@DeleteMapping("/{postId}")
-	public Mono<ResponseEntity<?>> deletePost(@PathVariable("postId") String postId) {
+	public Mono<ResponseEntity<?>> deletePosts(@PathVariable("postId") String postId) {
 		return this.postService.deletePost(postId)
 			.thenReturn(ResponseEntity.noContent().build());
 	}
+
 }
