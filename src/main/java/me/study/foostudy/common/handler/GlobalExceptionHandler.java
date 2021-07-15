@@ -9,11 +9,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
+import me.study.foostudy.common.exception.BusinessException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	protected ResponseEntity<?> handleIllegalArgumentException(final IllegalArgumentException e) {
+		return ResponseEntity.badRequest().body(e.getMessage());
+	}
+
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<?> handleBusinessException(final BusinessException e) {
+		// FIXME: 2021/07/15 STATUS 와 BODY 만드는 부분 공통화 수정 필요  -ksc
 		return ResponseEntity.badRequest().body(e.getMessage());
 	}
 
