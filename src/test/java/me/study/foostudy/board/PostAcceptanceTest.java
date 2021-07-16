@@ -15,6 +15,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.PathParametersSnippet;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
@@ -24,6 +25,7 @@ import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 
 @DisplayName("게시글")
+@WithMockUser(username = "testUser")
 public class PostAcceptanceTest extends AcceptanceTest {
 
 	@DisplayName("게시글을 등록한다")
