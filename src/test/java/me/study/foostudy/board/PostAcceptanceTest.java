@@ -8,8 +8,11 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
@@ -19,6 +22,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
+import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.dto.RequestPostDto;
 import me.study.foostudy.board.dto.RequestUpdatePostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
@@ -27,6 +31,14 @@ import reactor.core.publisher.Mono;
 @DisplayName("게시글")
 @WithMockUser(username = "testUser")
 public class PostAcceptanceTest extends AcceptanceTest {
+
+	@Autowired
+	MongoTemplate mongoTemplate;
+
+	@BeforeEach
+	void setUp() {
+		mongoTemplate.dropCollection(Post.class);
+	}
 
 	@DisplayName("게시글을 등록한다")
 	@Test
