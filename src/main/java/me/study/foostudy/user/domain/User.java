@@ -1,17 +1,17 @@
 package me.study.foostudy.user.domain;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @Document("user")
 public class User implements UserDetails {
 
@@ -20,11 +20,7 @@ public class User implements UserDetails {
 
 	private String username;
 	private String password;
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-	}
+	private List<? extends GrantedAuthority> authorities;
 
 	@Override
 	public boolean isAccountNonExpired() {
