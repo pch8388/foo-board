@@ -9,11 +9,12 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+import me.study.foostudy.user.domain.User;
 import me.study.foostudy.user.domain.UserRepository;
 import me.study.foostudy.user.exception.NotFoundUserException;
 import reactor.core.publisher.Mono;
@@ -36,24 +37,28 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public ReactiveUserDetailsService userDetailsService(UserRepository userRepository) {
-		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
 
+	@Bean
+	public ReactiveUserDetailsService userDetailsService(UserRepository userRepository) {
 		return username -> userRepository.findByUsername(username)
-			.map(user -> User.builder()
-				.username(user.getUsername())
-				.password(encoder.encode(user.getPassword()))
-				.authorities(user.getAuthorities())
-				.build())
+			.cast(UserDetails.class)
 			.switchIfEmpty(Mono.error(new NotFoundUserException(username)));
 	}
 
 	@Bean
 	public CommandLineRunner userLoader(MongoOperations operations) {
+		String pass = passwordEncoder().encode("test");
 		return args -> {
 			operations.dropCollection(User.class);
-			operations.save(User.builder().username("test").password("test").authorities(
-				List.of(new SimpleGrantedAuthority("ROLE_USER"))).build());
+			operations.save(
+				User.builder()
+					.username("test")
+					.password(pass)
+					.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+					.build());
 		};
 	}
 }
