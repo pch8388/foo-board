@@ -8,12 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.study.foostudy.board.domain.Post;
-import me.study.foostudy.common.utils.RequestMapper;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestPostDto implements RequestMapper<Post> {
+public class RequestPostDto {
 	@NotEmpty(message = "Title cannot be empty")
 	private String title;
 
@@ -21,11 +20,11 @@ public class RequestPostDto implements RequestMapper<Post> {
 	@Size(min = 1, max = 10_000, message = "Content must be between 1 and 10000 characters")
 	private String content;
 
-	@Override
-	public Post toEntity() {
+	public Post toEntityWithWriter(String userId) {
 		return Post.builder()
 			.title(title)
 			.content(content)
+			.userId(userId)
 			.build();
 	}
 }

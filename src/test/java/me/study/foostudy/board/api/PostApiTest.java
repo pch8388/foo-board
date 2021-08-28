@@ -43,7 +43,7 @@ class PostApiTest {
 		final String content = "test111";
 
 		// when
-		Mockito.when(postService.saveNewPost(any()))
+		Mockito.when(postService.saveNewPost(any(), any()))
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
 
 		// then
@@ -74,7 +74,7 @@ class PostApiTest {
 	@CsvSource({"'', test111", "test, ''", "'', ''"})
 	void savePost_valid_exception(String title, String content) {
 		// when
-		Mockito.when(postService.saveNewPost(any()))
+		Mockito.when(postService.saveNewPost(any(), any()))
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
 
 		// then

@@ -18,8 +18,8 @@ public class PostService {
 
 	private final PostRepository postRepository;
 
-	public Mono<ResponsePostDto> saveNewPost(RequestPostDto postDto) {
-		return this.postRepository.save(postDto.toEntity())
+	public Mono<ResponsePostDto> saveNewPost(RequestPostDto postDto, String userId) {
+		return this.postRepository.save(postDto.toEntityWithWriter(userId))
 			.map(ResponsePostDto::convertFromEntity);
 	}
 
