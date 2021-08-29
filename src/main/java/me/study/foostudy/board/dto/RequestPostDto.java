@@ -1,7 +1,6 @@
 package me.study.foostudy.board.dto;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -13,10 +12,10 @@ import me.study.foostudy.board.domain.Post;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestPostDto {
-	@NotEmpty(message = "Title cannot be empty")
+	@NotBlank(message = "Title cannot be empty")
 	private String title;
 
-	@NotNull(message = "Content cannot be null")
+	@NotBlank(message = "Content cannot be empty")
 	@Size(min = 1, max = 10_000, message = "Content must be between 1 and 10000 characters")
 	private String content;
 
