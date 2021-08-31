@@ -18,7 +18,6 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.PathParametersSnippet;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import me.study.foostudy.AcceptanceTest;
@@ -29,7 +28,6 @@ import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 
 @DisplayName("게시글")
-@WithMockUser(username = "testUser")
 public class PostAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
@@ -64,8 +62,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		// given  게시글을 3개 등록한다
 		final ResponsePostDto responsePostDto =
 			게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
-		게시글_등록_되어있음("새로운 게시글 제목 - 2", "새로운 게시글 내용을 등록합니다. - 2");
-		게시글_등록_되어있음("새로운 게시글 제목 - 3", "새로운 게시글 내용을 등록합니다. - 3");
+			게시글_등록_되어있음("새로운 게시글 제목 - 2", "새로운 게시글 내용을 등록합니다. - 2");
+			게시글_등록_되어있음("새로운 게시글 제목 - 3", "새로운 게시글 내용을 등록합니다. - 3");
 
 		// when, then
 		게시글_상세조회(responsePostDto);
@@ -103,6 +101,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글_삭제_되어있음(String postId) {
 		client.delete().uri("/posts/{postId}", postId)
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.exchange()
 			.expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
 			.expectBody()
@@ -113,6 +112,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글_수정_되어있음(String postId, String updateContent) {
 		final ResponsePostDto responseDto = client.patch().uri("/posts/{postId}", postId)
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost(updateContent)),
@@ -161,6 +161,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private ResponsePostDto 게시글_등록(String title, String content) {
 		return client.post().uri("/posts")
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestPost(title, content)),
@@ -197,6 +198,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글_상세조회(ResponsePostDto postDto) {
 		final ResponsePostDto responsePostDto = client.get().uri("/posts/{postId}", postDto.getId())
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk()
@@ -215,6 +217,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글_목록_조회(int size) {
 		final List<ResponsePostDto> responsePosts = client.get().uri("/posts")
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk()
@@ -240,6 +243,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
 	private void 게시글이_존재하지_않음(String postId) {
 		final String errorMessage = client.patch().uri("/posts/" + postId)
+			.headers(headers -> headers.setBasicAuth("test", "test"))
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
 			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost("수정된 게시글 내용 등록")),
