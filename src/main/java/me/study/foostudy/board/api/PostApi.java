@@ -5,7 +5,7 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,9 +33,7 @@ public class PostApi {
 
 	@PostMapping
 	public Mono<ResponseEntity<?>> createNewPosts(
-		@Valid @RequestBody Mono<RequestPostDto> postDto, Authentication auth) {
-		final User user = (User)auth.getPrincipal();
-
+		@Valid @RequestBody Mono<RequestPostDto> postDto, @AuthenticationPrincipal User user) {
 		return postDto.flatMap(dto -> this.postService.saveNewPost(dto, user.getId()))
 			.map(savedItem ->
 				ResponseEntity.created(URI.create("/posts/" + savedItem.getId()))

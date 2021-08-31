@@ -9,9 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
 @Document("user")
 public class User implements UserDetails {
 
@@ -21,6 +22,14 @@ public class User implements UserDetails {
 	private String username;
 	private String password;
 	private List<? extends GrantedAuthority> authorities;
+
+	@Builder
+	public User(String username, String password,
+		List<? extends GrantedAuthority> authorities) {
+		this.username = username;
+		this.password = password;
+		this.authorities = authorities;
+	}
 
 	@Override
 	public boolean isAccountNonExpired() {

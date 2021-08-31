@@ -2,6 +2,8 @@ package me.study.foostudy.board.api;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,12 +29,17 @@ import reactor.test.StepVerifier;
 class PostApiTest {
 
 	private PostService postService;
-	private PostApi postApi;
+	WebTestClient client;
 
 	@BeforeEach
 	void setUp() {
 		postService = Mockito.mock(PostService.class);
-		postApi = new PostApi(postService);
+		client = WebTestClient
+			.bindToController(new PostApi(postService))
+			.apply(springSecurity())
+			.configureClient()
+			.filter(basicAuthentication("test", "test"))
+			.build();
 	}
 
 	@DisplayName("게시글 저장")
@@ -41,15 +48,15 @@ class PostApiTest {
 		// given
 		final String title = "Test";
 		final String content = "test111";
+		final String userId = "test";
 
 		// when
 		Mockito.when(postService.saveNewPost(any(), any()))
-			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
+			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).userId(
+				userId).build())));
 
 		// then
-		WebTestClient
-			.bindToController(postApi)
-			.build()
+		client
 			.post().uri("/posts")
 			.body(BodyInserters.fromPublisher(Mono.just(new RequestPostDto(title, content)),
 				RequestPostDto.class))
@@ -73,14 +80,9 @@ class PostApiTest {
 	@ParameterizedTest
 	@CsvSource({"'', test111", "test, ''", "'', ''"})
 	void savePost_valid_exception(String title, String content) {
-		// when
-		Mockito.when(postService.saveNewPost(any(), any()))
-			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).build())));
 
-		// then
-		WebTestClient
-			.bindToController(postApi)
-			.build()
+		// when, then
+		client
 			.post().uri("/posts")
 			.body(BodyInserters.fromPublisher(Mono.just(new RequestPostDto(title, content)),
 				RequestPostDto.class))
@@ -99,9 +101,11 @@ class PostApiTest {
 		// given
 		final String title = "title";
 		final String content = "content";
+		final String userId = "test";
 		final Post post = Post.builder()
 			.title(title)
 			.content(content)
+			.userId(userId)
 			.build();
 
 		// when
@@ -109,9 +113,7 @@ class PostApiTest {
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(post)));
 
 		// then
-		WebTestClient
-			.bindToController(postApi)
-			.build()
+		client
 			.get().uri("/posts/{postId}", "test-id")
 			.exchange()
 			.expectStatus().isOk()

@@ -38,6 +38,7 @@ public class Post extends BaseEntity {
 
 	private void validateArguments(String title, String content, String userId) {
 		if (isBlankExistsArgument(title, content, userId)) {
+			System.out.println("userId : " + userId);
 			throw new IllegalArgumentException("Post 필수값 누락");
 		}
 	}
