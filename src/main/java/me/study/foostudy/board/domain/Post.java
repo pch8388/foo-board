@@ -33,13 +33,13 @@ public class Post extends BaseEntity {
 		this.userId = userId;
 	}
 
-	public void updateContent(String userId, String content) {
-		validateUpdateUser(userId);
+	public void updateContent(String updateUserId, String content) {
+		validateUpdateUser(updateUserId);
 		this.content = content;
 	}
 
-	private void validateUpdateUser(String userId) {
-		if (isNotOwn(userId)) {
+	private void validateUpdateUser(String updateUserId) {
+		if (isNotOwn(updateUserId)) {
 			throw new UpdateOtherUserPostException();
 		}
 	}
