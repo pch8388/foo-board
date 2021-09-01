@@ -42,7 +42,7 @@ public class CustomErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
 		final Map<String, Object> errorAttributes =
 			getErrorAttributes(request, ErrorAttributeOptions.defaults());
 
-		return ServerResponse.status(HttpStatus.BAD_REQUEST)
+		return ServerResponse.status(HttpStatus.UNAUTHORIZED)
 			.contentType(MediaType.APPLICATION_JSON)
 			.body(BodyInserters.fromValue(errorAttributes));
 	}

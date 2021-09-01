@@ -59,6 +59,13 @@ public class SecurityConfig {
 					.password(pass)
 					.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
 					.build());
+
+			operations.save(
+				User.builder()
+					.username("update-user")
+					.password(pass)
+					.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+					.build());
 		};
 	}
 }
