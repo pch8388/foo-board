@@ -24,7 +24,7 @@ class PostTest {
 	void updatePost() {
 		Post newPost = createPost("New Title", "New Content", "test-user");
 
-		newPost.updateContent("Update Content");
+		newPost.updateContent("test-user", "Update Content");
 
 		assertThat(newPost.getTitle()).isEqualTo("New Title");
 		assertThat(newPost.getContent()).isEqualTo("Update Content");

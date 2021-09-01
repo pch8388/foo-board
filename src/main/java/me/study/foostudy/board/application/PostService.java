@@ -1,7 +1,5 @@
 package me.study.foostudy.board.application;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -28,10 +26,10 @@ public class PostService {
 			.map(ResponsePostDto::convertFromEntity);
 	}
 
-	public Mono<ResponsePostDto> updatePost(String postId, RequestUpdatePostDto updatePostDto) {
+	public Mono<ResponsePostDto> updatePost(String postId, RequestUpdatePostDto updatePostDto, String userId) {
 		return this.postRepository.findById(postId)
 			.flatMap(post -> {
-				post.updateContent(updatePostDto.getUpdateContent());
+				post.updateContent(userId, updatePostDto.getUpdateContent());
 				return this.postRepository.save(post);
 			})
 			.map(ResponsePostDto::convertFromEntity)

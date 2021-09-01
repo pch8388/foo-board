@@ -54,8 +54,9 @@ public class PostApi {
 	@PatchMapping("/{postId}")
 	public Mono<ResponseEntity<?>> updatePosts(
 		@PathVariable("postId") String postId,
-		@Valid @RequestBody Mono<RequestUpdatePostDto> updatePostDto) {
-		return updatePostDto.flatMap(dto -> this.postService.updatePost(postId, dto))
+		@Valid @RequestBody Mono<RequestUpdatePostDto> updatePostDto,
+		@AuthenticationPrincipal User user) {
+		return updatePostDto.flatMap(dto -> this.postService.updatePost(postId, dto, user.getId()))
 			.map(updatedItem ->
 				ResponseEntity.ok().body(updatedItem));
 	}

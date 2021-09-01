@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.Builder;
 import lombok.Getter;
+import me.study.foostudy.board.exception.UpdateOtherUserPostException;
 import me.study.foostudy.common.domain.BaseEntity;
 
 @Getter
@@ -32,13 +33,23 @@ public class Post extends BaseEntity {
 		this.userId = userId;
 	}
 
-	public void updateContent(String content) {
+	public void updateContent(String userId, String content) {
+		validateUpdateUser(userId);
 		this.content = content;
+	}
+
+	private void validateUpdateUser(String userId) {
+		if (isNotOwn(userId)) {
+			throw new UpdateOtherUserPostException();
+		}
+	}
+
+	private boolean isNotOwn(String userId) {
+		return !this.userId.equals(userId);
 	}
 
 	private void validateArguments(String title, String content, String userId) {
 		if (isBlankExistsArgument(title, content, userId)) {
-			System.out.println("userId : " + userId);
 			throw new IllegalArgumentException("Post 필수값 누락");
 		}
 	}

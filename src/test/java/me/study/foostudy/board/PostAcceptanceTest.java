@@ -123,7 +123,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 	}
 
 	private void 게시글_수정_실패(String postId, String 수정_내용, String username, String 원본_내용) {
-		final ResponsePostDto responseDto = client.patch().uri("/posts/{postId}", postId)
+		final String message = client.patch().uri("/posts/{postId}", postId)
 			.headers(로그인_되어_있음(username))
 			.contentType(APPLICATION_JSON)
 			.accept(APPLICATION_JSON)
@@ -131,19 +131,12 @@ public class PostAcceptanceTest extends AcceptanceTest {
 				RequestUpdatePostDto.class))
 			.exchange()
 			.expectStatus().isBadRequest()
-			.expectBody(ResponsePostDto.class)
-			.consumeWith(getDocument("post-update-item",
-				getPathParameterWithPostId(),
-				getUpdatePostRequestSnippet(), getPostResponseSnippet()))
+			.expectBody(String.class)
 			.returnResult()
 			.getResponseBody();
 
 		// then
-		assertThat(responseDto).isNotNull();
-		assertThat(responseDto.getId()).isNotEmpty();
-		assertThat(responseDto.getContent()).isEqualTo(원본_내용);
-		assertThat(responseDto.getCreatedDate())
-			.isEqualTo(responseDto.getModifiedDate());
+		assertThat(message).isEqualTo("다른 유저의 게시글을 수정할 수 없습니다");
 	}
 
 	private void 게시글_수정_되어있음(String postId, String 수정_내용) {
