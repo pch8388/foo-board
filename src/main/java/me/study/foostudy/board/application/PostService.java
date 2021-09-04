@@ -36,8 +36,12 @@ public class PostService {
 			.switchIfEmpty(Mono.error(new IllegalArgumentException("잘못된 post id")));
 	}
 
-	public Mono<Void> deletePost(String postId) {
-		return this.postRepository.deleteById(postId);
+	public Mono<Void> deletePost(String postId, String userId) {
+		return this.postRepository.findById(postId)
+			.flatMap(post -> {
+				post.validatePermission(userId);
+				return this.postRepository.delete(post);
+			});
 	}
 
 	public Mono<ResponsePostDto> findPostsById(String postId) {

@@ -62,8 +62,10 @@ public class PostApi {
 	}
 
 	@DeleteMapping("/{postId}")
-	public Mono<ResponseEntity<?>> deletePosts(@PathVariable("postId") String postId) {
-		return this.postService.deletePost(postId)
+	public Mono<ResponseEntity<?>> deletePosts(
+		@PathVariable("postId") String postId,
+		@AuthenticationPrincipal User user) {
+		return this.postService.deletePost(postId, user.getId())
 			.thenReturn(ResponseEntity.noContent().build());
 	}
 

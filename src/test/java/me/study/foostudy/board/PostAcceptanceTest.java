@@ -29,7 +29,7 @@ import me.study.foostudy.board.dto.RequestUpdatePostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 
-@DisplayName("게시글")
+@DisplayName("게시글 인수테스트")
 public class PostAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
@@ -111,6 +111,27 @@ public class PostAcceptanceTest extends AcceptanceTest {
 		게시글이_존재하지_않음(postId);
 	}
 
+	@DisplayName("다른사람의 게시글을 삭제하려고 하면 예외가 발생한다")
+	@Test
+	void deletePost_with_other_user() {
+		// given
+		final ResponsePostDto postDto = 게시글_등록_되어있음("새로운 게시글 제목 - 1", "새로운 게시글 내용을 등록합니다. - 1");
+
+		// when, then
+		게시글_삭제_실패(postDto.getId(), "update-user");
+	}
+
+	private void 게시글_삭제_실패(String postId, String username) {
+		client.delete().uri("/posts/{postId}", postId)
+			.headers(로그인_되어_있음(username))
+			.exchange()
+			.expectStatus().isForbidden()
+			.expectBody()
+			.consumeWith(getDocument("post-delete-item",
+				getPathParameterWithPostId()));
+
+	}
+
 	private void 게시글_삭제_되어있음(String postId) {
 		client.delete().uri("/posts/{postId}", postId)
 			.headers(로그인_되어_있음())
@@ -130,7 +151,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 			.body(BodyInserters.fromPublisher(Mono.just(requestUpdatePost(수정_내용)),
 				RequestUpdatePostDto.class))
 			.exchange()
-			.expectStatus().isBadRequest()
+			.expectStatus().isForbidden()
 			.expectBody(String.class)
 			.returnResult()
 			.getResponseBody();

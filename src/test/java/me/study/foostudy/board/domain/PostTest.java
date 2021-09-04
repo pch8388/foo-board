@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import me.study.foostudy.board.exception.UpdateOtherUserPostException;
+import me.study.foostudy.board.exception.PostPermissionException;
 
 class PostTest {
 
@@ -40,7 +40,7 @@ class PostTest {
 
 		assertThatThrownBy(
 				() -> newPost.updateContent("other-user", "Update Content"))
-			.isInstanceOf(UpdateOtherUserPostException.class)
+			.isInstanceOf(PostPermissionException.class)
 			.hasMessage("다른 유저의 게시글을 수정할 수 없습니다");
 
 	}

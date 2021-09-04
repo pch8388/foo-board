@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.Builder;
 import lombok.Getter;
-import me.study.foostudy.board.exception.UpdateOtherUserPostException;
+import me.study.foostudy.board.exception.PostPermissionException;
 import me.study.foostudy.common.domain.BaseEntity;
 
 @Getter
@@ -34,13 +34,13 @@ public class Post extends BaseEntity {
 	}
 
 	public void updateContent(String updateUserId, String content) {
-		validateUpdateUser(updateUserId);
+		validatePermission(updateUserId);
 		this.content = content;
 	}
 
-	private void validateUpdateUser(String updateUserId) {
-		if (isNotOwn(updateUserId)) {
-			throw new UpdateOtherUserPostException();
+	public void validatePermission(String userId) {
+		if (isNotOwn(userId)) {
+			throw new PostPermissionException();
 		}
 	}
 
