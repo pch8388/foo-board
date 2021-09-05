@@ -1,6 +1,7 @@
 package me.study.foostudy.user.domain;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,14 +22,21 @@ public class User implements UserDetails {
 
 	private String username;
 	private String password;
-	private List<? extends GrantedAuthority> authorities;
+	private Set<Role> roles;
 
-	@Builder
-	public User(String username, String password,
-		List<? extends GrantedAuthority> authorities) {
+	public User(String username, String password) {
+		new User(username, password, Role.ROLE_USER);
+	}
+
+	private User(String username, String password, Role... roles) {
 		this.username = username;
 		this.password = password;
-		this.authorities = authorities;
+		this.roles = Set.of(roles);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return roles;
 	}
 
 	@Override
@@ -49,9 +57,5 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
-	}
-
-	public UserDetails toUserDetails() {
-		return this;
 	}
 }
