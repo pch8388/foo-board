@@ -1,10 +1,14 @@
 package me.study.foostudy.infra.config;
 
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -23,7 +27,9 @@ public class SecurityConfig {
 	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 		return http
 			.authorizeExchange(exchanges ->
-					exchanges.anyExchange()
+					exchanges
+						.pathMatchers(HttpMethod.POST, "/users").permitAll()
+						.anyExchange()
 						.authenticated()
 						.and()
 						.httpBasic()
@@ -50,8 +56,19 @@ public class SecurityConfig {
 		String pass = passwordEncoder().encode("test");
 		return args -> {
 			operations.dropCollection(User.class);
-			operations.save(new User("test", pass));
-			operations.save(new User("update-user", pass));
+			operations.save(
+				User.builder()
+					.username("test")
+					.password(pass)
+					.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+					.build());
+
+			operations.save(
+				User.builder()
+					.username("update-user")
+					.password(pass)
+					.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+					.build());
 		};
 	}
 }

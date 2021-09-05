@@ -2,6 +2,7 @@ package me.study.foostudy.board.api;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.*;
 
@@ -24,16 +25,15 @@ import me.study.foostudy.board.dto.ResponsePostDto;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
 @AutoConfigureWebTestClient
 class PostApiTest {
 
 	private PostService postService;
-	WebTestClient client;
+	private WebTestClient client;
 
 	@BeforeEach
 	void setUp() {
-		postService = Mockito.mock(PostService.class);
+		postService = mock(PostService.class);
 		client = WebTestClient
 			.bindToController(new PostApi(postService))
 			.apply(springSecurity())
@@ -51,7 +51,7 @@ class PostApiTest {
 		final String userId = "test";
 
 		// when
-		Mockito.when(postService.saveNewPost(any(), any()))
+		when(postService.saveNewPost(any(), any()))
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(Post.builder().title(title).content(content).userId(
 				userId).build())));
 
@@ -109,7 +109,7 @@ class PostApiTest {
 			.build();
 
 		// when
-		Mockito.when(postService.findPostsById(any()))
+		when(postService.findPostsById(any()))
 			.thenReturn(Mono.just(ResponsePostDto.convertFromEntity(post)));
 
 		// then
