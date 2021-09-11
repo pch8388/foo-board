@@ -28,7 +28,7 @@ public class SecurityConfig {
 		return http
 			.authorizeExchange(exchanges ->
 					exchanges
-						.pathMatchers(HttpMethod.POST, "/users").permitAll()
+						.pathMatchers(HttpMethod.POST, "/users", "/login").permitAll()
 						.anyExchange()
 						.authenticated()
 						.and()

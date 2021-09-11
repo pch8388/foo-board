@@ -3,6 +3,7 @@ package me.study.foostudy.user.dto;
 import java.util.List;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,10 +18,10 @@ public class RequestUserDto {
 	private String username;
 	private String password;
 
-	public User createUser() {
+	public User createUser(PasswordEncoder passwordEncoder) {
 		return User.builder()
 			.username(username)
-			.password(password)
+			.password(passwordEncoder.encode(password))
 			.authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
 			.build();
 	}

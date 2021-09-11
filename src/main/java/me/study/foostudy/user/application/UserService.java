@@ -1,5 +1,6 @@
 package me.study.foostudy.user.application;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,10 @@ import reactor.core.publisher.Mono;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public Mono<ResponseUserDto> register(RequestUserDto requestUserDto) {
-		return this.userRepository.save(requestUserDto.createUser())
+		return this.userRepository.save(requestUserDto.createUser(passwordEncoder))
 			.map(ResponseUserDto::convertFromEntity);
 	}
 }
