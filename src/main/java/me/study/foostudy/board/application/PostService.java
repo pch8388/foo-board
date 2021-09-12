@@ -23,7 +23,7 @@ public class PostService {
 	}
 
 	public Flux<ResponsePostDto> findAll(PageRequest pageRequest) {
-		return this.postRepository.findByIdNotNull(pageRequest)
+		return this.postRepository.findByIdNotNullOrderByCreatedDateDesc(pageRequest)
 			.map(ResponsePostDto::convertFromEntity);
 	}
 
