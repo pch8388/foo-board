@@ -1,5 +1,6 @@
 package me.study.foostudy.board.application;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,8 @@ public class PostService {
 			.map(ResponsePostDto::convertFromEntity);
 	}
 
-	public Flux<ResponsePostDto> findAll() {
-		return this.postRepository.findAll()
+	public Flux<ResponsePostDto> findAll(PageRequest pageRequest) {
+		return this.postRepository.findByIdNotNull(pageRequest)
 			.map(ResponsePostDto::convertFromEntity);
 	}
 
