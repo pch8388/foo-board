@@ -22,6 +22,7 @@ import me.study.foostudy.board.application.PostService;
 import me.study.foostudy.board.domain.Post;
 import me.study.foostudy.board.dto.RequestPostDto;
 import me.study.foostudy.board.dto.ResponsePostDto;
+import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -33,6 +34,8 @@ class PostApiTest {
 
 	@BeforeEach
 	void setUp() {
+		BlockHound.install();
+
 		postService = mock(PostService.class);
 		client = WebTestClient
 			.bindToController(new PostApi(postService))
